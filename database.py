@@ -13,9 +13,18 @@ def create_table():
                 title TEXT NOT NULL,
                 content TEXT NOT NULL
             )''')
-def new_note():
+        conn.commit()
+
+def new_note(title, content):
     with conect_db() as conn:
-        conn.execute
+        conn.execute('''
+            INSERT INTO notes (title, content)
+            VALUES (?, ?)
+        ''', (title, content))
+        conn.commit()
 
-
+#crea la tabla si no existe
 create_table()
+
+#agregar nota
+new_note("Mi primera nota", "Este es el contenido de mi primera nota.")
