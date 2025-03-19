@@ -28,3 +28,11 @@ create_table()
 
 #agregar nota
 new_note("Mi primera nota", "Este es el contenido de mi primera nota.")
+
+
+def get_notes():
+    with conect_db() as conn:
+        cursor = conn.cursor()
+        query = 'SELECT * FROM notes'
+        cursor.execute(query)
+        return cursor.fetchall()
