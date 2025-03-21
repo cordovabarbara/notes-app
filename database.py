@@ -27,8 +27,7 @@ def new_note(title, content):
 create_table()
 
 #agregar nota
-new_note("Mi primera nota", "Este es el contenido de mi primera nota.")
-
+#new_note("Mi primera nota", "Este es el contenido de mi primera nota.")
 
 #Funcion para tener todas la notas
 def get_notes():
@@ -49,4 +48,15 @@ def get_note_by_id(id):
         return f"No se encontro una nota con el ID {id}"
     return note
 
-print(get_note_by_id(100))
+#print(get_note_by_id(100))
+
+#Funcion para eliminar notar por id
+def delete_note(id):
+    with conect_db() as conn:
+        cursor = conn.cursor()
+        query = 'DELETE FROM notes WHERE id =?'
+        cursor.execute(query, (id,))
+        if cursor.rowcount == 0:
+            return f"No existe una nota con el id{id}"
+        conn.commit()
+        return f"Nota con ID {id} eliminada exitosamente"
