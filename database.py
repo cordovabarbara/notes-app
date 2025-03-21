@@ -30,9 +30,23 @@ create_table()
 new_note("Mi primera nota", "Este es el contenido de mi primera nota.")
 
 
+#Funcion para tener todas la notas
 def get_notes():
     with conect_db() as conn:
         cursor = conn.cursor()
         query = 'SELECT * FROM notes'
         cursor.execute(query)
         return cursor.fetchall()
+    
+#Funcion para tener todas la notas por id
+def get_note_by_id(id):
+    with conect_db() as conn:
+        cursor = conn.cursor()
+        query = 'SELECT * FROM notes WHERE id = ?'
+        cursor.execute(query, (id,))
+        note = cursor.fetchone()
+    if note is None:
+        return f"No se encontro una nota con el ID {id}"
+    return note
+
+print(get_note_by_id(100))
