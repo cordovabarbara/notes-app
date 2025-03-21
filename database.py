@@ -1,10 +1,11 @@
 import sqlite3
 
-
 DATABASE_NAME = "notes.db"
 
 def conect_db():
-    return sqlite3.connect(DATABASE_NAME)
+    conn = sqlite3.connect(DATABASE_NAME)
+    conn.row_factory = sqlite3.Row
+    return conn
 
 def create_table():
     with conect_db() as conn:
@@ -17,7 +18,7 @@ def create_table():
         conn.commit()
 
 #crea una nueva nota
-def new_note(title, content):
+def new_note(title: str, content: str):
     with conect_db() as conn:
         conn.execute('''
             INSERT INTO notes (title, content)
@@ -31,24 +32,32 @@ create_table()
 #agregar nota
 #new_note("Mi segunda nota", "Lista a seguir para programar en Python.")
 
-#Funcion para tener todas la notas
+#Funcion para obtener todas la notas
 def get_notes():
     with conect_db() as conn:
+        conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
-        query = 'SELECT * FROM notes'
-        cursor.execute(query)
-        return cursor.fetchall()
+        cursor.execute("SELECT * FROM notes")
+        notes = cursor.fetchall()
 
-#Funcion para tener la notas por id
+        if not notes:
+            return{"message": "No hay notas disponibles"}
+        
+        return [dict(note) for note in notes]
+
+#Funcion para obtener  nota por id
 def get_note_by_id(id):
     with conect_db() as conn:
+        conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         query = 'SELECT * FROM notes WHERE id = ?'
         cursor.execute(query, (id,))
         note = cursor.fetchone()
+
     if note is None:
-        return f"No se encontro una nota con el ID {id}"
-    return note
+        return {"message": f"No se encontró una nota con el ID {id}"}
+    
+    return dict(note)
 
 #Funcion para eliminar notar por id
 def delete_note(id):
@@ -56,8 +65,10 @@ def delete_note(id):
         cursor = conn.cursor()
         query = 'DELETE FROM notes WHERE id =?'
         cursor.execute(query, (id,))
+
         if cursor.rowcount == 0:
             return f"No existe una nota con el id {id}"
+        
         conn.commit()
         return f"La Nota con ID {id} eliminada exitosamente"
 
@@ -97,5 +108,5 @@ def update_note(id, title=None, content=None):
         return f"La Nota con ID {id} fue actualiza exitosamente" 
 
     except sqlite3.Error as e:
-        return f"Error al actualizar la nota: {e}"   
-        
+        return f"Error al actualizar la nota: {e}"
+
